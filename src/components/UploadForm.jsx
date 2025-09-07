@@ -43,9 +43,9 @@ function UploadForm() {
 
             axios({
                 method: "POST",
-                url: "https://detect.roboflow.com/aicook-lcv4d/3",
+                url: "https://serverless.roboflow.com/aicook-lcv4d/3",
                 params: {
-                    api_key: "THFU6CVXMDuaozeptpA1"
+                    api_key: process.env.REACT_APP_ROBOFLOW_API
                 },
                 data: base64Image,
                 headers: {
@@ -63,6 +63,7 @@ function UploadForm() {
             })
             .catch(function(error) {
                 console.log(error.message);
+                console.log(process.env.REACT_APP_ROBOFLOW_API);
             });
         };
     };
@@ -75,7 +76,7 @@ function UploadForm() {
 
             fetch("https://api-inference.huggingface.co/models/flax-community/t5-recipe-generation", {
                 headers: { 
-                    Authorization: "Bearer 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",
+                    Authorization: process.env.REACT_APP_HUGGINGFACE_API,
                     'Content-Type': 'application/json'
                 },
                 method: "POST",
