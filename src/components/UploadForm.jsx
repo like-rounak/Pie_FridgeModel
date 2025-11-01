@@ -4,7 +4,6 @@ import { useDropzone } from 'react-dropzone';
 import { FaUpload, FaSpinner } from 'react-icons/fa';
 import styled, { keyframes } from 'styled-components';
 
-
 const spin = keyframes`
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -13,6 +12,40 @@ const spin = keyframes`
 const SpinningFaSpinner = styled(FaSpinner)`
   animation: ${spin} 2s linear infinite;
 `;
+
+// NOTE: API keys should be moved to environment variables for production
+const ROBOFLOW_API_KEY = "THFU6CVXMDuaozeptpA1";
+const HUGGINGFACE_API_KEY = "Bearer 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";
+
+const formatRecipeText = (text) => {
+    let formatted = text;
+    
+    // Add line breaks for sections
+    formatted = formatted.replace(/title:/i, '<br />Title:');
+    formatted = formatted.replace(/ingredients:/i, '<br />Ingredients:');
+    formatted = formatted.replace(/directions:/i, '<br />Directions:<br />');
+    
+    // Text formatting improvements
+    formatted = formatted.replace(/(?<=\D)(?=\b\d+\b)/g, ',');
+    formatted = formatted.replace(/_/g, ' ');
+    formatted = formatted.replace(/(\.\s)([a-z])/g, match => match.toUpperCase());
+    formatted = formatted.replace(/(directions:<br \/>\s*)([^<]+)/i, (match, p1, p2) => {
+        return p1 + p2.charAt(0).toUpperCase() + p2.slice(1);
+    });
+    formatted = formatted.replace(/(\d+)\sDegrees\s(f)/gi, '$1 °F');
+    formatted = formatted.replace(/(\.\s)/g, '$1<br />');
+    
+    // Clean up ingredients section
+    const sections = formatted.split('<br />');
+    for (let i = 0; i < sections.length; i++) {
+        if (sections[i].startsWith('Ingredients:')) {
+            sections[i] = sections[i].replace(',', '');
+            break;
+        }
+    }
+    
+    return sections.join('<br />');
+};
 
 function UploadForm() {
     const [selectedFile, setSelectedFile] = useState(null);
@@ -32,6 +65,7 @@ function UploadForm() {
         setIsLoading(true);
         if (!selectedFile) {
             console.error('No file selected for upload');
+            setIsLoading(false);
             return;
         }
 
@@ -44,24 +78,26 @@ function UploadForm() {
                 method: "POST",
                 url: "https://detect.roboflow.com/aicook-lcv4d/3",
                 params: {
-                    api_key: "THFU6CVXMDuaozeptpA1"
+                    api_key: ROBOFLOW_API_KEY
                 },
                 data: base64Image,
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded"
                 }
             })
-            .then(function(response) {
+            .then(response => {
                 console.log(response.data);
                 if (response.data && Array.isArray(response.data.predictions)) {
                     const classes = response.data.predictions.map(item => item.class);
                     setIngredients(classes);
                 } else {
                     console.error('Invalid response format');
+                    setIsLoading(false);
                 }
             })
-            .catch(function(error) {
+            .catch(error => {
                 console.log(error.message);
+                setIsLoading(false);
             });
         };
     };
@@ -74,7 +110,7 @@ function UploadForm() {
 
             fetch("https://api-inference.huggingface.co/models/flax-community/t5-recipe-generation", {
                 headers: { 
-                    Authorization: "Bearer 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",
+                    Authorization: HUGGINGFACE_API_KEY,
                     'Content-Type': 'application/json'
                 },
                 method: "POST",
@@ -82,53 +118,28 @@ function UploadForm() {
             })
             .then(response => response.json())
             .then(result => {
-                console.log(result); // Log the entire response object
+                console.log(result);
                 if (result && result[0] && result[0].generated_text) {
-                    let recipeText = result[0].generated_text;
-                    recipeText = recipeText.replace(/title:/i, '<br />Title:');
-                    recipeText = recipeText.replace(/ingredients:/i, '<br />Ingredients:');
-                    recipeText = recipeText.replace(/directions:/i, '<br />Directions:<br />'); // Start directions on a new line
-                    recipeText = recipeText.replace(/(?<=\D)(?=\b\d+\b)/g, ','); // Add comma before each number except the first one
-                    recipeText = recipeText.replace(/_/g, ' '); // Replace underscore with space
-                    recipeText = recipeText.replace(/(\.\s)([a-z])/g, function(match) {
-                        return match.toUpperCase();
-                    }); // Capitalize first letter after every full stop
-                    recipeText = recipeText.replace(/(directions:<br \/>\s*)([^<]+)/i, function(match, p1, p2) {
-                        return p1 + p2.charAt(0).toUpperCase() + p2.slice(1);
-                    }); // Capitalize first letter of the first line in directions
-                    recipeText = recipeText.replace(/(\d+)\sDegrees\s(f)/gi, '$1 °F'); // Convert "Degrees f" to "°F"
-                    recipeText = recipeText.replace(/(\.\s)/g, '$1<br />'); // Add new line after each full stop
-
-                    // Split the recipe text into sections
-                    let sections = recipeText.split('<br />');
-                    // Find the ingredients section and remove the first comma
-                    for (let i = 0; i < sections.length; i++) {
-                        if (sections[i].startsWith('Ingredients:')) {
-                            sections[i] = sections[i].replace(',', '');
-                            break;
-                        }
-                    }
-                    // Join the sections back together
-                    recipeText = sections.join('<br />');
-
-                    setRecipe(recipeText);
+                    setRecipe(formatRecipeText(result[0].generated_text));
                     setIsLoading(false);
                 } else {
                     console.error('No data in response');
+                    setIsLoading(false);
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                setIsLoading(false);
+            });
         }
     }, [ingredients]);
-    
-    
-    
+
     return (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '60px', marginBottom: '60px', paddingBottom: '60px' }}>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <div style={{ paddingTop: '20px' }}>
-                    <h1>Upload the Image of your Fridge</h1> {/* Title */}
-                    <p>We will list out the ingredients, and make a recipe for you too ...</p> {/* Paragraph */}
+                    <h1>Upload the Image of your Fridge</h1>
+                    <p>We will list out the ingredients, and make a recipe for you too...</p>
                     <div {...getRootProps()} style={{ border: '1px dashed gray', padding: '20px', marginBottom: '20px', height: '400px', width: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                         <input {...getInputProps()} />
                         {selectedFile ? 
