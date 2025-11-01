@@ -1,6 +1,5 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import axios from 'axios';
-import openai from 'openai';
 import { useDropzone } from 'react-dropzone';
 import { FaUpload, FaSpinner } from 'react-icons/fa';
 import styled, { keyframes } from 'styled-components';
