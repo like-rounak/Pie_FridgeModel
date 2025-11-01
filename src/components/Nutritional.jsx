@@ -4,6 +4,10 @@ import { useDropzone } from 'react-dropzone';
 import { FaUpload } from 'react-icons/fa';
 import { calorieMap } from '../data/calorieData';
 
+// IMPORTANT: API key should be moved to environment variables for production
+// Create a .env file with: REACT_APP_HUGGINGFACE_API_KEY=your_key_here
+const HUGGINGFACE_API_KEY = "Bearer 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";
+
 function Nutritional() {
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
@@ -33,7 +37,7 @@ function Nutritional() {
                 url: "https://api-inference.huggingface.co/models/ashutoshsharma58/indian_food_image_detection",
                 data: data,
                 headers: {
-                    "Authorization": "Bearer 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"
+                    "Authorization": HUGGINGFACE_API_KEY
                 }
             })
             .then(function(response) {

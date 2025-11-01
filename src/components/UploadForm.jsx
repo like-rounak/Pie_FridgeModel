@@ -13,7 +13,11 @@ const SpinningFaSpinner = styled(FaSpinner)`
   animation: ${spin} 2s linear infinite;
 `;
 
-// NOTE: API keys should be moved to environment variables for production
+// IMPORTANT: These API keys should be moved to environment variables for production
+// Create a .env file with:
+// REACT_APP_ROBOFLOW_API_KEY=your_key_here
+// REACT_APP_HUGGINGFACE_API_KEY=your_key_here
+// Then use process.env.REACT_APP_ROBOFLOW_API_KEY instead
 const ROBOFLOW_API_KEY = "THFU6CVXMDuaozeptpA1";
 const HUGGINGFACE_API_KEY = "Bearer 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";
 
