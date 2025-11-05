@@ -9,7 +9,6 @@ import { Services } from "./components/services";
 import { Gallery } from "./components/gallery";
 import Nutritional from './components/Nutritional';
 import { Team } from "./components/Team";
-import { Contact } from "./components/contact";
 import JsonData from "./data/data.json";
 import "./App.css";
 
@@ -32,7 +31,6 @@ const MainRoutes = () => {
                         <Services data={landingPageData.Services} />
                         <Gallery data={landingPageData.Gallery} />
                         <Team data={landingPageData.Team} />
-                        <Contact data={landingPageData.Contact} />
                     </>
                 } />
                 <Route path="/uploadform" element={<UploadForm />} />

@@ -13,12 +13,28 @@ export const Services = (props) => {
         <div className="row">
           {props.data
             ? props.data.map((d, i) => (
-                <div key={`${d.name}-${i}`} className="col-md-4">
-                  {" "}
-                  <i className={d.icon}></i>
-                  <div className="service-desc">
-                    <h3>{d.name}</h3>
-                    <p>{d.text}</p>
+                <div key={`${d.name}-${i}`} className="col-md-4" style={{ padding: '10px' }}>
+                  <div 
+                    style={{
+                      border: '1px solid #ddd',
+                      borderRadius: '10px',
+                      padding: '20px',
+                      textAlign: 'center',
+                      backgroundColor: '#fff',
+                      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                      height: '300px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      transition: 'all 0.3s ease'
+                    }}
+                  >
+                    <i className={d.icon} style={{ marginBottom: '15px', color: '#007BFF' }}></i>
+                    <div className="service-desc">
+                      <h3 style={{ color: '#333' }}>{d.name}</h3>
+                      <p style={{ height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', color: '#666' }}>{d.text}</p>
+                    </div>
                   </div>
                 </div>
               ))

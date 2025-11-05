@@ -14,10 +14,37 @@ export const Header = (props) => {
                 </h1>
                 <p>{props.data ? props.data.paragraph : "Loading"}</p>
                 <a
-                  href="#features"
-                  className="btn btn-custom btn-lg page-scroll"
+                  href="/UploadForm"
+                  className="btn btn-modern btn-lg page-scroll"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "10px 20px",
+                    fontSize: "18px",
+                    fontWeight: "bold",
+                    color: "#fff",
+                    backgroundColor: "#007BFF",
+                    border: "2px solid #007BFF",
+                    borderRadius: "30px",
+                    textDecoration: "none",
+                    transition: "all 0.3s ease-in-out",
+                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                    position: "relative",
+                    overflow: "hidden",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = "#0056b3";
+                    e.target.style.color = "#fff";
+                    e.target.style.boxShadow = "0 6px 8px rgba(0, 0, 0, 0.2)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = "#007BFF";
+                    e.target.style.color = "#fff";
+                    e.target.style.boxShadow = "0 4px 6px rgba(0, 0, 0, 0.1)";
+                  }}
                 >
-                  Learn More
+                  <span style={{ marginRight: "10px" }}>✨</span> Try Our AI Now
                 </a>{" "}
               </div>
             </div>
